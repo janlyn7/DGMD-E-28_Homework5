@@ -1,0 +1,62 @@
+.square{
+  background-color: #e7e7e7;
+  width: 70px;
+  height: 70px;
+  border: none;
+  color: black;
+  padding: 5px 5px 5px 5px;
+  text-align: center;
+  vertical-align: baseline;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 24px;
+  margin: 5px 5px 5px 5px;
+}
+.key:hover{
+  background-color: lightgray;
+}
+
+.key {
+  background-color: #e7e7e7;
+  width: 55px;
+  height: 70px;
+  border: none;
+  color: black;
+  padding: 5px 5px 5px 5px;
+  text-align: center;
+  vertical-align: baseline;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 24px;
+  margin: 4px 4px 4px 4px;
+  cursor: pointer;
+  border-radius: 7px;
+}
+
+.funckey {
+  background-color: #e7e7e7;
+  width: 85px;
+  height: 70px;
+  border: none;
+  color: black;
+  padding: 5px 5px 5px 5px;
+  text-align: center;
+  vertical-align: baseline;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 18px;
+  margin: 4px 4px 4px 4px;
+  cursor: pointer;
+  border-radius: 7px;
+}
+#grid {
+    margin: auto;
+	background-color: white;
+    height:500px;
+    width:425px;
+    padding: 9px 12px 13px 12px;
+}
+
+#banner{
+    font-size: large;
+}
