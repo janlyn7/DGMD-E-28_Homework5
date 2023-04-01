@@ -3,14 +3,13 @@ function loadBoard() {
 	let game = new Game();
 	game.buildGameBoard();
 	game.buildKeyBoard();
-    game.getRandomWord();
 }
 function Game() {
 	this.debug = 0;
 	this.theWord = "";
     this.boardDim = [5, 6]; // dimension for Squares board
     this.numGuesses = 1;    // track number of guesses (same as number of rows)
-	this.currentSq=0;       // track which Square should be filled in
+	this.currentSq = 0;       // track which Square should be filled in
 	this.qwerty = ["QWERTYUIOP", "ASDFGHJKL", "ZXCVBNM"];
 	this.colors = ["#86888a", "#cdb559", "#6aaa64", "#ffffff"]
 
@@ -34,11 +33,18 @@ function Game() {
 	this.disableKeyboard = disableKeyboard;
 	this.addRestartButton = addRestartButton;
 	this.reloadBoard = reloadBoard;
+	this.setDebugMode = setDebugMode;
 
-	this.setMessage("&nbsp;");
+	this.getRandomWord();
 }
 
+// create the game board of 30 Squares
 function buildGameBoard() {
+	// allow User to select if Debug Mode is turned on or off
+	// if "On" is selected, the word will appear below the keyboard
+	// default = "Off"
+	this.setDebugMode();
+
 	let board = document.getElementById("gameboard");
 	let grid = document.createElement('div');
 	grid.id = "grid";
@@ -54,6 +60,7 @@ function buildGameBoard() {
 	board.appendChild(grid);
 }
 
+// create the Qwerty keyboard for Users to enter letters onto the game board
 function buildKeyBoard() {
 	let keyboard = document.getElementById("keyboard")
 	let keygrid = document.createElement('div');
@@ -62,14 +69,17 @@ function buildKeyBoard() {
 	this.qwerty.forEach(row => {
 		let letterArray = row.split("");
 
+		// on the third row include an "ENTER" key
 		if (letterArray.includes("Z")) {
 			this.createFunctionButton("ENTER", keygrid);
 		}
 
+		// create the letter buttons
 		letterArray.forEach(letter => {
 			this.createKeyButton(letter, keygrid);
 		});
 
+		// on the third row, include a "BACK" key
 		if (letterArray.includes("Z")) {
 			this.createFunctionButton("BACK", keygrid);
 		}
@@ -80,7 +90,7 @@ function buildKeyBoard() {
 	keyboard.appendChild(keygrid);
 }
 
-// create a square and attach it to the grid
+// create a square and attach it to the game grid
 function createSquare(numId, grid) {
 	let button = document.createElement( "button");
 	button.id = "square" + numId;
@@ -91,6 +101,7 @@ function createSquare(numId, grid) {
 	grid.appendChild(button);
 }
 
+// create key button and attach it to the key grid
 function createKeyButton(letter, grid) {
 	let button = document.createElement( "button");
 	button.id = letter + "button";
@@ -105,9 +116,12 @@ function createKeyButton(letter, grid) {
 	grid.appendChild(button);
 }
 
+// event listener function for keyboard letters
 function addLetter(id) {
+	// clear announcement banner
 	this.setMessage("&nbsp;");
 
+	// only allow letters to be added to the current row
 	if ((this.currentSq >= this.start) && (this.currentSq <= this.end)) {
 		let letter = id.charAt(0);
 
@@ -116,6 +130,8 @@ function addLetter(id) {
 		this.currentSq++;
 	}
 }
+
+// create the "ENTER" and "BACK" keys with their respective actions
 function createFunctionButton(name, grid) {
 	let button = document.createElement( "button");
 	button.id = name;
@@ -137,6 +153,9 @@ function createFunctionButton(name, grid) {
 	grid.appendChild(button);
 }
 
+// if all the squares in the row have been filled in, verify the input word is valid
+// if all 5 squares have not been filled, announce "Not enough letters
+// if input is invalid, announce "Not in word list"
 function checkGuess() {
 	if (( (this.currentSq) % 5 !== 0 ) || (this.currentSq === this.start) ){
 		setMessage("Not enough letters");
@@ -144,6 +163,7 @@ function checkGuess() {
 		let guess = "";
 		let index;
 
+		// join the input letters to make a word
 		for (index = this.start; index <= this.end; index++) {
 			guess += document.getElementById("square" + index).innerText;
 		}
@@ -159,9 +179,10 @@ function checkGuess() {
 
 		// if valid, update colors
 		this.updateColors(guess);
+
+		// check if game is over (i.e. correct guess or user has made 6 guesses)
 		let done = ((guess === this.theWord) || (this.numGuesses === 6));
 
-		// check if guess is a match to the word
 		if (done) {
 			if (guess === this.theWord) {
 				this.setMessage("Congratulations!");
@@ -169,6 +190,7 @@ function checkGuess() {
 				this.setMessage("The word is <b>" + this.theWord + "</b>");
 			}
 
+			// disallow further input via the keyboard
 			this.disableKeyboard();
 			this.addRestartButton();
 			return;
@@ -183,6 +205,10 @@ function checkGuess() {
 	}
 }
 
+// update the colors of the squares on the game board and the letters on the keyboard
+// green if the guess letter is in the same place as the answer letter
+// yellow if the guess letter is in the answer but not in the correct place
+// gray if the guess letter is not in the answer at all
 function updateColors(guess) {
 	let index = 0;
 	let wordArray = this.theWord.split("");
@@ -207,13 +233,13 @@ function updateColors(guess) {
 
 	let btn, sq;
 	let sqIndex = this.start;
-	let rgbGreen = "rgb(106, 170, 100)";
+	let rgbGreen = "rgb(106, 170, 100)";  // background color is returned as rgb() instead of hex
 	for (index = 0; index < 5; index++) {
 		// update keyboard letter color
 		btn = document.getElementById(guessArray[index]+"button");
 		btn.style.color = this.colors[3];
 
-		// if button is green, do not update the color
+		// if keyboard letter is green, do not change the color
 		if (btn.style.backgroundColor !== rgbGreen) {
 			btn.style.backgroundColor = this.colors[results[index]];
 		}
@@ -226,6 +252,9 @@ function updateColors(guess) {
 	}
 
 }
+
+// when 'BACK' button is pressed, move backward to the previous square on the row and
+// remove input letter
 function moveBack() {
 	this.setMessage("&nbsp;");
 
@@ -238,19 +267,25 @@ function moveBack() {
 		sq.innerHTML = "&nbsp;";
 	}
 }
+
+// retrieves a 5-letter word via random-word-api
 async function getRandomWord() {
     let res = await fetch("https://random-word-api.vercel.app/api?words=1&length=5")
         .then(res => res.json())
         .then(data => {
+			// get the first word in the returned array
 			this.setWord(data[0]);
         });
 	return res;
 }
 
+// stores the word in uppercase format
 function setWord(word) {
 	this.theWord = word.toUpperCase();
-	console.log(this.theWord);
 }
+
+// uses the Merriam-Webster Collegiate Dictionary API to verify if the User's guess is valid or not
+// NOTE: this function uses XMLHTTPRequest synchronously
 function validateGuess( guess ){
 
 	let req = new XMLHttpRequest();
@@ -266,7 +301,7 @@ function validateGuess( guess ){
 	}
 }
 
-// turn off hover and disable all buttons on the keyboard after the game has ended
+// turns off hover and disables all buttons on the keyboard after the game has ended
 function disableKeyboard() {
 	let btn;
 	this.qwerty.forEach(row => {
@@ -287,21 +322,25 @@ function disableKeyboard() {
 	btn.style.pointerEvents = "none";
 }
 
-// after the game has ended, add a button below the
+// after the game has ended, adds a button below the
 // game board allowing the user to reset the board and play another game
 function addRestartButton() {
     let restart = document.getElementById("restart");
+	restart.innerText = "";
+
     let btn = document.createElement( "button");
     btn.type = "button";
     btn.id = "playAgain";
     btn.style.fontSize = "20px";
     btn.innerText = "Play Again";
     btn.setAttribute("class", "w3-button w3-black w3-round-large")
-    btn.addEventListener ('click', this.reloadBoard);
+    btn.addEventListener ('click', () => {
+		this.reloadBoard();
+	});
     restart.appendChild(btn);
 }
 
-// reload board and start a new game
+// reloads game board and keyboard and starts a new game
 function reloadBoard() {
     // remove the old board
     let div = document.getElementById("grid");
@@ -316,29 +355,57 @@ function reloadBoard() {
     div.parentNode.removeChild(div);
 
 	// clear banner
-	setMessage(" ");
+	this.setMessage(" ");
 
     // load a fresh game board
     loadBoard();
 }
 
-/*
-function setDebugMode(){
-	let banner = document.getElementById("banner");
-	let label = document.createElement("label");
-	let txt = document.createTextNode("Debug Mode: ");
-	//label.setAttribute("for", "");
-	label.appendChild(txt);
-	banner.appendChild(label);
-
-	let radio = document.createElement("input");
-	radio.setAttribute("type", "radio");
-  	banner.appendChild(radio);
-
-}
-*/
-
+// updates the announcement banner
 function setMessage(msg)
 {
     document.getElementById("banner").innerHTML=msg;
 }
+
+// lets the User select if they would like to play with debug mode on or off
+function setDebugMode() {
+	let banner = document.getElementById("banner");
+
+	const data = {
+		"On": false,
+		"Off": false,
+	};
+
+	let label, input;
+
+	label = document.createElement("label");
+	label.innerHTML = "Debug Mode: &nbsp;";
+	banner.appendChild(label);
+
+	for (let key in data) {
+		label = document.createElement("label");
+    	label.innerHTML = "&nbsp; &nbsp;" + key + "&nbsp;";
+    	input = document.createElement("input");
+		input.name = "debug";
+    	input.type = "radio";
+
+		if (key === "On") {
+			input.addEventListener('change', () => {
+				let worddiv = document.getElementById("restart");
+				worddiv.innerText = this.theWord;
+			});
+		} else {
+			input.defaultChecked = true;
+			input.addEventListener('change', () => {
+				let worddiv = document.getElementById("restart");
+				worddiv.innerHTML = "&nbsp;";
+			});
+		}
+
+    	label.appendChild(input);
+    	banner.appendChild(label);
+	}
+
+}
+
+
