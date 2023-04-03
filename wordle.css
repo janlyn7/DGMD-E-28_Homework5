@@ -1,7 +1,8 @@
 @media screen and (min-width: 600px) {
-    display: block;
-    overflow: auto;
+  body {
     width: 100%; /* The width is 100%, when the viewport is 600px or larger */
+    margin: auto;
+  }
 }
 
 .square{
