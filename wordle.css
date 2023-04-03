@@ -1,8 +1,6 @@
 @media screen and (min-width: 600px) {
-  .left, .main, .right {
     margin: auto;
-    width: 100%; /* The width is 100%, when the viewport is 600px or smaller */
-  }
+    width: 100%; /* The width is 100%, when the viewport is 600px or larger */
 }
 
 .square{
