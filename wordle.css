@@ -1,7 +1,7 @@
 @media screen and (min-width: 600px) {
   body {
     width: 100%; /* The width is 100%, when the viewport is 600px or larger */
-    display: inline-block;
+    display: block;
   }
 }
 
